@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>群俠壇說 · 文曲聖典</title>
+<style>
+:root{
+  --shell:#23262b;
+  --shell-edge:#15171a;
+  --key:#3a3e46;
+  --key-hi:#4a4f59;
+  --lcd:#aebfa0;
+  --lcd-dim:#9cad8e;
+  --ink:#1c2916;
+  --ink-soft:#3a4a32;
+  --gold:#d9a441;
+  --red:#8c3b2e;
+  --blue:#2e5d8c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:radial-gradient(ellipse at 50% 20%, #33373e 0%, #17191d 70%);
+  font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:14px;
+}
+.device{
+  width:100%;max-width:760px;
+  background:linear-gradient(160deg,#2b2f36,var(--shell) 40%,#1d2025);
+  border:1px solid var(--shell-edge);
+  border-radius:22px;
+  box-shadow:0 22px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+  padding:16px 18px 14px;
+}
+.brand{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:2px 6px 10px;
+}
+.brand .logo{color:var(--gold);font-weight:700;letter-spacing:.35em;font-size:14px;}
+.brand .model{color:#8a8f99;font-size:11px;letter-spacing:.2em;}
+.lcd{
+  position:relative;
+  background:var(--lcd);
+  border-radius:8px;
+  border:3px solid #0d0f11;
+  box-shadow:inset 0 0 24px rgba(28,41,22,.35), inset 0 2px 6px rgba(0,0,0,.3);
+  overflow:hidden;
+}
+.lcd::after{ /* 掃描線 */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(28,41,22,.06) 0 1px, transparent 1px 3px);
+}
+.statusbar{
+  display:flex;flex-wrap:wrap;gap:4px 14px;
+  padding:8px 12px;font-size:12px;color:var(--ink);
+  border-bottom:2px solid var(--ink);
+  background:var(--lcd-dim);
+  font-weight:700;
+}
+.statusbar span b{font-weight:700;}
+.bar{display:inline-block;width:64px;height:8px;border:1px solid var(--ink);vertical-align:middle;margin-left:3px;background:transparent;}
+.bar i{display:block;height:100%;background:var(--ink);}
+#log{
+  height:340px;overflow-y:auto;
+  padding:12px 14px;font-size:14px;line-height:1.75;color:var(--ink);
+  scrollbar-width:thin;scrollbar-color:var(--ink-soft) transparent;
+}
+#log p{margin-bottom:6px;}
+#log .sys{color:var(--ink-soft);}
+#log .talk{font-weight:700;}
+#log .gain{color:var(--blue);font-weight:700;}
+#log .dmg{color:var(--red);font-weight:700;}
+#log .title{
+  text-align:center;font-weight:700;letter-spacing:.3em;
+  border-top:1px dashed var(--ink);border-bottom:1px dashed var(--ink);
+  padding:4px 0;margin:8px 0;
+}
+#log p{animation:fadein .18s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion: reduce){#log p{animation:none;}}
+#combatbar{
+  border-top:2px solid var(--ink);
+  background:var(--lcd-dim);
+  padding:8px 12px;font-size:12px;font-weight:700;color:var(--ink);
+  display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;
+}
+#combatbar .cbar{display:inline-block;width:110px;height:10px;border:1px solid var(--ink);vertical-align:middle;margin:0 4px;}
+#combatbar .cbar i{display:block;height:100%;background:var(--ink);transition:width .25s ease;}
+#combatbar .foe .cbar i{background:var(--red);}
+#notice{
+  position:absolute;inset:0;z-index:10;
+  background:rgba(20,28,16,.55);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.noticeCard{
+  background:var(--lcd);border:3px solid var(--ink);border-radius:10px;
+  max-width:520px;width:100%;max-height:90%;overflow-y:auto;
+  padding:16px 18px;color:var(--ink);box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.noticeCard h3{text-align:center;letter-spacing:.4em;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:10px;}
+.noticeCard .ver{font-weight:700;margin:10px 0 4px;color:var(--red);}
+.noticeCard li{margin-left:20px;line-height:1.7;font-size:13px;}
+.noticeCard button{
+  display:block;margin:14px auto 2px;font-family:inherit;font-weight:700;
+  font-size:14px;color:#1d1405;background:linear-gradient(180deg,#e8bb5e,var(--gold));
+  border:1px solid #101215;border-radius:8px;padding:8px 30px;cursor:pointer;
+  box-shadow:0 2px 0 #0c0d0f;
+}
+.actions{
+  border-top:2px solid var(--ink);
+  background:var(--lcd-dim);
+  padding:10px;display:flex;flex-wrap:wrap;gap:8px;
+  min-height:64px;
+}
+.actions button, .creator button{
+  font-family:inherit;font-size:13px;font-weight:700;color:var(--lcd);
+  background:linear-gradient(180deg,var(--key-hi),var(--key));
+  border:1px solid #101215;border-radius:8px;
+  padding:8px 14px;cursor:pointer;
+  box-shadow:0 2px 0 #0c0d0f;
+  transition:transform .05s ease, box-shadow .05s ease;
+}
+.actions button:hover{background:linear-gradient(180deg,#565c68,var(--key-hi));}
+.actions button:active{transform:translateY(2px);box-shadow:0 0 0 #0c0d0f;}
+.actions button.gold{color:#1d1405;background:linear-gradient(180deg,#e8bb5e,var(--gold));}
+.actions button.danger{background:linear-gradient(180deg,#a1503f,var(--red));}
+.actions button:disabled{opacity:.45;cursor:not-allowed;}
+.keysrow{
+  display:flex;justify-content:center;gap:10px;padding-top:12px;
+}
+.keysrow i{
+  width:34px;height:10px;border-radius:5px;background:#31353c;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05);
+}
+/* 創角畫面 */
+.creator{padding:16px 18px;color:var(--ink);font-size:14px;}
+.creator h2{text-align:center;letter-spacing:.4em;margin-bottom:4px;}
+.creator .sub{text-align:center;font-size:12px;color:var(--ink-soft);margin-bottom:14px;}
+.creator .row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.creator label{width:64px;font-weight:700;}
+.creator input[type=text]{
+  font-family:inherit;font-size:14px;padding:6px 8px;flex:1;min-width:120px;
+  background:transparent;border:2px solid var(--ink);border-radius:6px;color:var(--ink);
+}
+.creator .attr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.creator .attr .nm{width:110px;font-weight:700;}
+.creator .attr .val{width:34px;text-align:center;font-weight:700;font-size:16px;}
+.creator .attr button{padding:2px 12px;font-size:15px;}
+.creator .hint{font-size:12px;color:var(--ink-soft);margin:2px 0 12px;}
+.creator .start{display:block;margin:14px auto 4px;font-size:16px;padding:10px 34px;}
+.hidden{display:none!important;}
+@media (max-width:520px){
+  #log{height:300px;font-size:13px;}
+  .device{padding:10px;}
+  .statusbar{font-size:11px;gap:3px 10px;}
+}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="brand">
+    <span class="logo">文曲聖典</span>
+    <span class="model">WQX-1020 · 群俠壇說 v1.0</span>
+  </div>
+  <div class="lcd">
+    <!-- 更新公告板 -->
+    <div id="notice" class="hidden">
+      <div class="noticeCard">
+        <h3>江湖告示</h3>
+        <div id="noticeBody"></div>
+        <button onclick="closeNotice()">知道了，闖蕩去也</button>
+      </div>
+    </div>
+    <!-- 創角 -->
+    <div id="creator" class="creator">
+      <h2>群俠壇說</h2>
+      <div class="sub">—— 致敬文曲星經典《英雄壇說》 ——</div>
+      <p style="margin-bottom:12px;">遠古大陸英雄壇的時空轉換裝置忽然發出低沉的召喚，十四歲的你被捲入光芒，睜眼已身在東方一片神秘大陸的中心——平安鎮。江湖傳言，暗黑勢力「幽冥壇」正在暗中滋長，剷除他們，便是你此行的使命。</p>
+      <div class="row">
+        <label>姓名</label>
+        <input type="text" id="cName" maxlength="8" placeholder="無名俠客">
+      </div>
+      <div class="row">
+        <label>性別</label>
+        <button onclick="setGender('男')" id="gM">男</button>
+        <button onclick="setGender('女')" id="gF">女</button>
+        <span id="gShow" style="font-weight:700;"></span>
+      </div>
+      <div style="font-weight:700;margin:8px 0 6px;">先天屬性（剩餘點數：<span id="ptsLeft">15</span>）</div>
+      <div class="attr"><span class="nm">膂力（攻擊）</span><button onclick="adj('str',-1)">−</button><span class="val" id="vstr">5</span><button onclick="adj('str',1)">＋</button></div>
+      <div class="attr"><span class="nm">悟性（學武）</span><button onclick="adj('wis',-1)">−</button><span class="val" id="vwis">5</span><button onclick="adj('wis',1)">＋</button></div>
+      <div class="attr"><span class="nm">根骨（氣血）</span><button onclick="adj('con',-1)">−</button><span class="val" id="vcon">5</span><button onclick="adj('con',1)">＋</button></div>
+      <div class="attr"><span class="nm">身法（閃避）</span><button onclick="adj('agi',-1)">−</button><span class="val" id="vagi">5</span><button onclick="adj('agi',1)">＋</button></div>
+      <div class="hint">※ 各門派拜師另有屬性門檻，配點時可得仔細掂量。</div>
+      <button class="start gold" style="color:#1d1405;background:linear-gradient(180deg,#e8bb5e,#d9a441);" onclick="startGame()">踏 入 江 湖</button>
+    </div>
+    <!-- 主畫面 -->
+    <div id="game" class="hidden">
+      <div class="statusbar" id="statusbar"></div>
+      <div id="log"></div>
+      <div id="combatbar" class="hidden"></div>
+      <div class="actions" id="actions"></div>
+    </div>
+  </div>
+  <div class="keysrow"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+
+<script>
+/* ============ 版本與更新公告 ============ */
+const GAME_VERSION = "3.0.0";
+const CHANGELOG = [
+  {v:"3.0.0", date:"江湖曆·夏", items:[
+    "新增【婚姻系統】：與心儀之人談心、贈禮，情投意合便可提親成家（茅山弟子受門規所限，敬請節哀）",
+    "新增【奇遇事件】：閒逛與歷練時有機率觸發掃地老僧、山洞殘卷、仙緣異果等十餘種際遇",
+    "新增【茅山符籙】：茅山弟子可畫雷符、護身符、神行符，戰鬥中祭出扭轉乾坤",
+    "新增【自動存檔】：進度自動保存於此裝置，關閉重開可續玩；存檔碼仍可跨裝置備份",
+    "新增【江湖告示】：每次版本更新，登入時展示更新內容（就是你現在看到的這個）",
+    "舊版存檔完全相容，直接讀取自動升級，不影響任何進度"
+  ]},
+  {v:"2.0.0", date:"江湖曆·春", items:[
+    "新增茅山派、獸王莊、赤蓮教三大門派",
+    "新增「聯網·暗號」祕技系統",
+    "戰鬥介面新增即時血條，日誌加入動效與自動裁剪"
+  ]},
+  {v:"1.0.0", date:"江湖曆·元年", items:[
+    "《群俠壇說》初版問世：四大門派、村長任務、黑風寨與幽冥地宮故事線"
+  ]}
+];
+
+/* ============ 存檔層（自動偵測 localStorage，失效則退回存檔碼） ============ */
+const SAVE_KEY="qunxia_save_v1", SEEN_KEY="qunxia_seen_ver";
+const store={ok:false};
+try{ localStorage.setItem("__qx","1"); localStorage.removeItem("__qx"); store.ok=true; }catch(e){}
+
+function migrate(o){ /* 舊版存檔升級：補齊新版欄位，進度不受影響 */
+  if(!o.skills) o.skills={basic:0,inner:0,attack:0,light:0};
+  if(!o.talismans) o.talismans={lei:0,hu:0,shen:0};
+  if(!o.love) o.love={};
+  if(o.married===undefined) o.married=null;
+  if(!o.flags) o.flags={map:false,camp:false,palace:false,ending:false,taskCount:0};
+  if(o.flags.homeDay===undefined) o.flags.homeDay=0;
+  o.ver=GAME_VERSION;
+  return o;
+}
+function saveGame(silent){
+  if(!P) return;
+  P.ver=GAME_VERSION;
+  if(store.ok){
+    try{ localStorage.setItem(SAVE_KEY, JSON.stringify(P)); }catch(e){}
+    if(!silent) log("【系統】進度已保存。","sys");
+  } else if(!silent){
+    log("【系統】此環境無法自動存檔，請至「存檔/讀檔」複製存檔碼備份。","sys");
+  }
+}
+function loadSaved(){
+  if(!store.ok) return null;
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    const o=JSON.parse(raw);
+    if(!o||!o.name) return null;
+    return migrate(o);
+  }catch(e){ return null; }
+}
+/* ============ 線上補丁（資料驅動熱更新） ============
+ * 將 patch.json 託管於任一靜態網址（如 GitHub Pages），填入 PATCH_URL。
+ * 玩家每次開啟遊戲時自動拉取：數值平衡、公告皆可線上調整，
+ * 無須重發遊戲檔、不影響玩家存檔。抓取失敗（離線）則靜默略過。
+ * 安全設計：僅接受「資料」覆蓋（數值/文字），絕不執行遠端程式碼。 */
+const PATCH_URL = ""; // ← 例："https://你的帳號.github.io/qunxia/patch.json"
+let PATCH_INFO = null;
+
+async function loadPatch(){
+  if(!PATCH_URL) return;
+  try{
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 4000);
+    const res = await fetch(PATCH_URL + "?t=" + Date.now(), {signal:ctrl.signal, cache:"no-store"});
+    clearTimeout(timer);
+    if(!res.ok) return;
+    applyPatch(await res.json());
+  }catch(e){ /* 離線或逾時：照常離線遊玩 */ }
+}
+function patchList(arr, byId, key){
+  if(!byId) return;
+  Object.keys(byId).forEach(id=>{
+    const item = arr.find(x=>(x[key||"id"])===id);
+    if(item && typeof byId[id]==="object") Object.assign(item, byId[id]);
+  });
+}
+function applyPatch(p){
+  if(!p || typeof p!=="object") return;
+  const o = p.overrides || {};
+  if(o.enemies) Object.keys(o.enemies).forEach(k=>{
+    if(ENEMIES[k] && typeof o.enemies[k]==="object") Object.assign(ENEMIES[k], o.enemies[k]);
+  });
+  patchList(SHOP_FOOD,  o.food);
+  patchList(SHOP_MED,   o.med);
+  patchList(SHOP_SMITH, o.smith);
+  patchList(GIFTS,      o.gifts, "name");
+  if(o.talismans) Object.keys(o.talismans).forEach(k=>{
+    if(TALIS[k] && typeof o.talismans[k]==="object") Object.assign(TALIS[k], o.talismans[k]);
+  });
+  if(Array.isArray(p.notes)){
+    for(let i=p.notes.length-1; i>=0; i--){
+      const n=p.notes[i];
+      if(n && n.v && Array.isArray(n.items) && !CHANGELOG.some(c=>c.v===n.v)) CHANGELOG.unshift(n);
+    }
+  }
+  PATCH_INFO = {version: p.version || "", applied: true};
+}
+function latestVer(){ return CHANGELOG.length ? CHANGELOG[0].v : GAME_VERSION; }
+
+function showNotice(){
+  const seen = store.ok ? (localStorage.getItem(SEEN_KEY)||"") : "";
+  if(seen===latestVer()) return;
+  const idx = CHANGELOG.findIndex(c=>c.v===seen);
+  const list = idx===-1 ? CHANGELOG : CHANGELOG.slice(0,idx);
+  const body=$("noticeBody");
+  body.innerHTML = `<p style="font-size:13px;margin-bottom:6px;">諸位少俠：《群俠壇說》已更新至 <b>v${latestVer()}</b>${PATCH_INFO?"（含線上補丁）":""}，本次更新內容如下——</p>` +
+    list.map(c=>`<div class="ver">v${c.v}（${c.date}）</div><ul>${c.items.map(i=>`<li>${i}</li>`).join("")}</ul>`).join("");
+  $("notice").classList.remove("hidden");
+}
+function closeNotice(){
+  $("notice").classList.add("hidden");
+  if(store.ok){ try{ localStorage.setItem(SEEN_KEY, latestVer()); }catch(e){} }
+}
+
+/* ============ 基礎資料 ============ */
+const TITLES = ["不堪一擊","毫不足慮","不足掛齒","初學乍練","勉勉強強","初窺門徑","初出茅廬","略知一二","普普通通","平平常常","平淡無奇","粗懂皮毛","半生不熟","登堂入室","略有小成","已有小成","鶴立雞群","駕輕就熟","青出於藍","融會貫通","心領神會","爐火純青","了然於胸","略有大成","已有大成","豁然貫通","非比尋常","出類拔萃","罕有敵手","技冠群雄","神乎其技","出神入化","傲視群雄","登峰造極","無與倫比","所向披靡","一代宗師","精深奧妙","神功蓋世","舉世無雙","驚世駭俗","撼天動地","震古爍今","超凡入聖","威鎮寰宇"];
+function lvTitle(lv){ return TITLES[Math.min(TITLES.length-1, Math.floor(lv/5))]; }
+
+const SECTS = {
+  taiyi:{
+    name:"太乙門", place:"太乙觀", master:"清嵐道長",
+    intro:"太乙門乃玄門正宗，講究以柔克剛、後發先至。清嵐道長仙風道骨，武功震古爍今，門下弟子遍佈天下。",
+    req:p=>true, reqText:"來者不拒（心術不正者除外）",
+    inner:"太乙玄功", attack:"太乙拳", light:"雲行步",
+    ult:{name:"四兩撥千斤", mult:2.4, cost:35, minLv:20,
+      desc:"借力打力，引對方千鈞之力落空，再順勢一送，任你是誰也得跌個大跟頭。"}
+  },
+  hanmei:{
+    name:"寒梅劍派", place:"寒梅峰", master:"梅孤白",
+    intro:"寒梅劍派立派於西北苦寒之地，峰頂終年積雪，遍植梅樹。劍法古樸飄逸、劍點密集，攻勢快若朔風捲雪，獨步西域。",
+    req:p=>p.agi>=8, reqText:"身法須達 8（劍走輕靈，遲鈍者難領其妙）",
+    inner:"寒梅心法", attack:"寒梅劍法", light:"踏雪步",
+    ult:{name:"梅開七度", mult:3.0, cost:45, minLv:20,
+      desc:"按梅花七瓣之形，一瞬間刺出七劍，其勢快若閃電，令人無從招架。"}
+  },
+  jingang:{
+    name:"金剛門", place:"千佛寺", master:"慧覺大師",
+    intro:"金剛門源自千佛寺武僧一脈，外練筋骨皮、內練一口氣。金剛不壞功一成，尋常刀劍加身亦如撓癢。",
+    req:p=>p.con>=8, reqText:"根骨須達 8（筋骨不堅，練之反傷己身）",
+    inner:"金剛不壞功", attack:"伏虎拳", light:"千斤墜縱躍術",
+    ult:{name:"金剛怒目", mult:2.6, cost:40, minLv:20,
+      desc:"怒目一喝，聲若洪鐘，拳出如杵，正是「金剛怒目，所以降伏四魔」。"}
+  },
+  baihua:{
+    name:"百花谷", place:"百花谷", master:"花千黛",
+    intro:"百花谷只收女徒，谷中亂花疊翠、暗香浮動。谷主花千黛一雙素手曾令無數強敵飲恨落英繽紛之中。",
+    req:p=>p.gender==="女"&&p.wis>=7, reqText:"僅收女徒，且悟性須達 7",
+    inner:"玉女心經", attack:"落英掌", light:"凌波微步",
+    ult:{name:"天女散花", mult:2.8, cost:40, minLv:20,
+      desc:"掌影漫天如落英繽紛，花雨過處，敵人已中了七、八處掌力。"}
+  },
+  maoshan:{
+    name:"茅山派", place:"茅山道院", master:"玄符子",
+    intro:"茅山符籙之術冠絕天下，弟子以硃砂黃紙為兵、咒語真言為刃，役使五雷。只是茅山「不羨鴛鴦只羨仙」，門規森嚴不許婚娶，想入此門的同道可要仔細掂量。",
+    req:p=>p.wis>=10, reqText:"悟性須達 10（資質魯鈍者，念咒容易咬到舌頭）",
+    inner:"茅山心法", attack:"五雷符法", light:"神行符",
+    ult:{name:"五雷轟頂", mult:3.2, cost:50, minLv:20,
+      desc:"仗劍捏訣，敕令一出，五道天雷自九霄直劈而下，端的是驚天動地。"}
+  },
+  shouwang:{
+    name:"獸王莊", place:"獸王莊", master:"齊嘯天",
+    intro:"獸王莊立莊於南疆莽林，莊主齊嘯天能與百獸溝通。門下武功剛猛狂野，長鞭一展，虎嘯猿啼齊出，敵人未交手先怯了三分。",
+    req:p=>p.str>=9, reqText:"膂力須達 9（連鞭子都掄不圓，如何馭獸？）",
+    inner:"獸王勁", attack:"伏獸鞭法", light:"靈猿縱",
+    ult:{name:"萬獸奔騰", mult:2.9, cost:45, minLv:20,
+      desc:"長嘯一聲，鞭影化作萬獸奔騰之勢，踏得地動山搖，勢不可擋。"}
+  },
+  chilian:{
+    name:"赤蓮教", place:"赤蓮總壇", master:"燄無明",
+    intro:"赤蓮教亦正亦邪，教眾行事狠辣，江湖人聞之色變。教主燄無明的赤蓮神功走的是至剛至烈的路子，進境奇快，卻也兇險——正派人士對赤蓮弟子向來沒什麼好臉色。",
+    req:p=>p.str+p.agi>=15, reqText:"膂力＋身法合計須達 15（外功底子不夠，強練神功必遭反噬）",
+    inner:"赤蓮神功", attack:"蓮華焰掌", light:"鬼影迷蹤",
+    ult:{name:"赤蓮業火", mult:3.4, cost:55, minLv:22,
+      desc:"雙掌推出，掌力所至如業火燎原，赤蓮朵朵綻放，焚盡當前一切。"}
+  }
+};
+
+const ENEMIES = {
+  dog:    {name:"惡犬",         hp:60,  atk:9,  def:1,  agi:4,  exp:16,  pot:4,  money:4,  desc:"一條凶巴巴的野狗，齜著牙朝你低吼。"},
+  poopi:  {name:"潑皮無賴",     hp:100, atk:14, def:2,  agi:5,  exp:30,  pot:7,  money:12, desc:"鎮上有名的潑皮，正在調戲賣菜的大娘。"},
+  bandit: {name:"山賊",         hp:170, atk:22, def:5,  agi:7,  exp:55,  pot:12, money:30, desc:"「此山是我開！留下買路財！」"},
+  wolf:   {name:"雪原孤狼",     hp:230, atk:30, def:6,  agi:12, exp:80,  pot:16, money:0,  desc:"綠油油的眼睛在林間閃著寒光。"},
+  robber: {name:"江洋大盜",     hp:320, atk:40, def:10, agi:10, exp:130, pot:24, money:80, desc:"官府海捕文書上懸賞百兩的巨寇。"},
+  minion: {name:"黑風寨嘍囉",   hp:420, atk:52, def:14, agi:12, exp:180, pot:30, money:60, desc:"幽冥壇外圍據點的嘍囉，刀口舔血之徒。"},
+  boss1:  {name:"黑風寨主·獨眼蛟",hp:900, atk:72, def:20, agi:14, exp:600, pot:100,money:300,desc:"獨眼蛟獰笑：「小娃娃，也敢闖你蛟爺爺的山寨？」", boss:1},
+  guard:  {name:"幽冥護法",     hp:1100,atk:92, def:26, agi:18, exp:450, pot:60, money:150,desc:"黑袍護法陰惻惻地笑著，掌風帶著屍臭。"},
+  boss2:  {name:"幽冥壇主·玄冥子",hp:2200,atk:118,def:34, agi:22, exp:3000,pot:300,money:1000,desc:"玄冥子負手而立：「螻蟻，本座給你一個跪下的機會。」", boss:2}
+};
+
+const SHOP_FOOD = [
+  {id:"bun",  name:"白麵饅頭", price:2,  food:25, hp:5,   desc:"熱騰騰的大饅頭"},
+  {id:"beef", name:"牛肉麵",   price:8,  food:60, hp:30,  desc:"悅來客棧招牌"},
+  {id:"wine", name:"女兒紅",   price:15, food:20, hp:0, mp:40, desc:"喝了渾身是勁"}
+];
+const SHOP_MED = [
+  {id:"jinchuang", name:"金創藥", price:20, hp:120,  desc:"外敷內服皆宜，療傷聖品"},
+  {id:"renshen",   name:"百年人參", price:60, hp:300, mp:100, desc:"大補元氣"}
+];
+const SHOP_SMITH = [
+  {id:"sword",  name:"精鋼劍", price:120, atk:15, type:"weapon", desc:"削鐵如泥（好吧，削木如泥）"},
+  {id:"saber",  name:"厚背刀", price:90,  atk:12, type:"weapon", desc:"勢大力沉"},
+  {id:"cloth",  name:"布衣",   price:30,  def:4,  type:"armor",  desc:"聊勝於無"},
+  {id:"leather",name:"皮甲",   price:150, def:10, type:"armor",  desc:"鞣製的牛皮甲"},
+  {id:"iron",   name:"鐵甲",   price:400, def:22, type:"armor",  desc:"沉是沉了點，扛揍"}
+];
+
+/* ============ 玩家狀態 ============ */
+let P = null;
+let inCombat = null;
+let creating = {str:5,wis:5,con:5,agi:5,gender:"男",pts:15};
+
+function newPlayer(name,gender,a){
+  return {
+    ver:GAME_VERSION,
+    name:name, gender:gender, age:14, day:1,
+    str:a.str, wis:a.wis, con:a.con, agi:a.agi,
+    hp:0, mp:0, exp:0, pot:30, money:20, food:80,
+    sect:null,
+    skills:{basic:0, inner:0, attack:0, light:0},
+    talismans:{lei:0, hu:0, shen:0},
+    love:{}, married:null,
+    weapon:null, armor:null,
+    flags:{map:false, camp:false, palace:false, ending:false, taskCount:0, homeDay:0},
+    task:null,
+    loc:"square"
+  };
+}
+function maxHp(){ return 100 + P.con*10 + P.skills.inner*8; }
+function maxMp(){ return 50 + P.con*4 + P.skills.inner*10; }
+function mainAtkLv(){ return Math.max(P.skills.basic, P.skills.attack); }
+function atkName(){ return P.skills.attack>=P.skills.basic && P.sect ? SECTS[P.sect].attack : "基本拳腳"; }
+function playerAtk(){ return P.str*2 + mainAtkLv()*3 + (P.weapon?P.weapon.atk:0); }
+function playerDef(){ return P.con + Math.floor(P.skills.inner*1.2) + (P.armor?P.armor.def:0); }
+function heroTitle(){
+  const lv = mainAtkLv();
+  if(P.flags.ending) return "武林盟主";
+  return lvTitle(lv);
+}
+
+/* ============ 介面工具 ============ */
+const $ = id=>document.getElementById(id);
+function log(html, cls){
+  const box=$("log");
+  const p=document.createElement("p");
+  if(cls) p.className=cls;
+  p.innerHTML=html;
+  box.appendChild(p);
+  while(box.children.length>150) box.removeChild(box.children[0]);
+  box.scrollTop=box.scrollHeight;
+}
+function logTitle(t){ log(t,"title"); }
+function clearLog(){ $("log").innerHTML=""; }
+function status(){
+  const s=$("statusbar");
+  const hpP=Math.round(P.hp/maxHp()*100), mpP=Math.round(P.mp/maxMp()*100), fdP=Math.round(P.food);
+  s.innerHTML =
+    `<span><b>${P.name}</b>【${heroTitle()}】</span>`+
+    `<span>氣血<span class="bar"><i style="width:${hpP}%"></i></span>${P.hp}/${maxHp()}</span>`+
+    `<span>內力<span class="bar"><i style="width:${mpP}%"></i></span>${P.mp}/${maxMp()}</span>`+
+    `<span>飽食<span class="bar"><i style="width:${fdP}%"></i></span></span>`+
+    `<span>潛能 <b>${P.pot}</b></span>`+
+    `<span>銀兩 <b>${P.money}</b></span>`+
+    `<span>第${P.day}日·${P.age}歲</span>`;
+}
+function buttons(list){
+  const a=$("actions"); a.innerHTML="";
+  list.forEach(b=>{
+    const btn=document.createElement("button");
+    btn.textContent=b.t;
+    if(b.cls) btn.className=b.cls;
+    if(b.dis) btn.disabled=true;
+    btn.onclick=b.f;
+    a.appendChild(btn);
+  });
+}
+function rand(n){ return Math.floor(Math.random()*n); }
+
+/* ============ 創角 ============ */
+function setGender(g){ creating.gender=g; $("gShow").textContent="已選："+g; }
+function adj(k,d){
+  if(d>0 && creating.pts<=0) return;
+  if(d<0 && creating[k]<=1) return;
+  if(d>0 && creating[k]>=20) return;
+  creating[k]+=d; creating.pts-=d;
+  $("v"+k).textContent=creating[k];
+  $("ptsLeft").textContent=creating.pts;
+}
+function startGame(){
+  const name = $("cName").value.trim() || "無名俠客";
+  P = newPlayer(name, creating.gender, creating);
+  P.hp=maxHp(); P.mp=maxMp();
+  $("creator").classList.add("hidden");
+  $("game").classList.remove("hidden");
+  logTitle("楔 子");
+  log("時空扭曲的強光散去，你發現自己站在一座熱鬧小鎮的廣場上。石碑上刻著三個大字——<b>平安鎮</b>。");
+  log("路過的吟遊詩人李也白打了個哈哈：「今天的天氣真是……哈哈。」","talk");
+  log("你摸了摸懷裡僅剩的二十兩碎銀。江湖路遠，先學一身武功再說。","sys");
+  log("【提示】先去<b>村長家</b>領任務賺取潛能與經驗，再到門派拜師學藝。武功練到一定火候，村長自會告訴你暗黑勢力的下落。","sys");
+  go("square");
+}
+
+/* ============ 時間與消耗 ============ */
+function tick(cost){
+  P.food = Math.max(0, P.food - cost);
+  if(rand(4)===0) P.day++;
+  if(P.day % 36 === 0 && rand(4)===0) P.age++;
+  if(P.food<=0){
+    P.hp = Math.max(1, P.hp - 10);
+    log("你餓得前胸貼後背，氣血隱隱流失。快去客棧吃點東西吧！","dmg");
+  }
+  saveGame(true);
+  status();
+}
+
+/* ============ 婚姻系統 ============ */
+const ROMANCE = {
+  "沈碧君":{ where:"med", intro:"藥鋪掌櫃的千金，正在櫃檯後碾藥，眉目如畫，滿身藥草清香。",
+    talk:["沈碧君抿嘴一笑：「這位少俠，是抓藥呢，還是……找我爹有事？」",
+          "沈碧君講起藥理頭頭是道：「三七止血、當歸補血，行走江湖可得分清楚。」",
+          "沈碧君望著窗外出神：「總在這方寸藥鋪裡，真想看看外面的江湖。」"] },
+  "陸小樓":{ where:"inn", intro:"悅來客棧的少東家，一手算盤打得劈啪響，笑起來眼睛彎彎的。",
+    talk:["陸小樓給你倒了碗茶：「跑堂的說你身手不錯，改天露兩手讓我開開眼？」",
+          "陸小樓壓低聲音：「跟你說，前天有個蒙面人在後院鬼鬼祟祟……江湖真亂哪。」",
+          "陸小樓撥著算盤笑道：「客棧雖小，南來北往的故事可不少。」"] }
+};
+const GIFTS = [
+  {name:"胭脂水粉", price:20,  fav:15},
+  {name:"白玉簪",   price:100, fav:40}
+];
+function fav(n){ return P.love[n]||0; }
+function romanceButtons(B, n){
+  const f=fav(n);
+  B.push({t:`與${n}談心${f>0?`（好感${f}）`:""}`, f:()=>chatNpc(n)});
+  if(f>=30) B.push({t:`贈禮給${n}`, f:()=>giftMenu(n)});
+  if(f>=100) B.push({t:`向${n}提親`, cls:"gold", f:()=>propose(n)});
+}
+function chatNpc(n){
+  const r=ROMANCE[n];
+  if(!P.love[n]){
+    P.love[n]=0;
+    log(r.intro,"sys");
+  }
+  const gain=6+rand(6)+(P.wis>=10?2:0);
+  P.love[n]=Math.min(120,fav(n)+gain);
+  log(r.talk[rand(r.talk.length)],"talk");
+  log(`（${n}的好感 +${gain}，目前 ${fav(n)}）`,"gain");
+  tick(8); saveGame(true);
+  go(r.where);
+}
+function giftMenu(n){
+  clearLog();
+  logTitle("贈 禮");
+  log(`要送什麼給${n}呢？禮輕情意重……不過重禮情意更重。`,"sys");
+  const B=GIFTS.map(g=>({t:`${g.name}（${g.price}兩·好感+${g.fav}）`, f:()=>{
+    if(P.money<g.price){ log("囊中羞澀，先去賺點銀兩吧。","dmg"); return; }
+    P.money-=g.price;
+    P.love[n]=Math.min(120,fav(n)+g.fav);
+    log(`${n}接過${g.name}，臉頰微紅：「你……有心了。」（好感 ${fav(n)}）`,"gain");
+    saveGame(true); status();
+  }}));
+  B.push({t:"↩ 返回", f:()=>go(ROMANCE[n].where)});
+  buttons(B);
+}
+function propose(n){
+  if(P.sect==="maoshan"){
+    log(`你鼓起勇氣正要開口，忽然想起師門戒律——茅山「不羨鴛鴦只羨仙」，不許婚娶！`,"dmg");
+    log(`${n}見你欲言又止，奇道：「你想說什麼？」你打了個哈哈：「今天的天氣真是……哈哈。」`,"talk");
+    log("（想成家的話……只能請掌門開恩，或者當初就別入茅山哪。）","sys");
+    return;
+  }
+  if(mainAtkLv()<20){ log(`${n}的家人上下打量你：「習武之人連${lvTitle(20)}的火候都沒有，怎麼保護我家孩子？」（主修武功需達20級）`,"dmg"); return; }
+  if(P.money<200){ log("提親總得備份像樣的聘禮——至少 200 兩。","dmg"); return; }
+  P.money-=200;
+  P.married={name:n};
+  clearLog();
+  logTitle("洞 房 花 燭");
+  log(`吹吹打打，十里紅妝。你與${n}拜了天地，結為夫妻！`,"talk");
+  log("賓客們鬧了半宿方散。從今往後，平安鎮上多了一處喚作「家」的地方。","sys");
+  log("【提示】廣場新增「家」：可用飯（每日一次全飽）、與伴侶雙修（經驗潛能加成）。","gain");
+  saveGame(true); status();
+  buttons([{t:"回廣場", f:()=>go("square")}]);
+}
+
+/* ============ 地圖 ============ */
+function go(loc){
+  if(inCombat) return;
+  P.loc=loc; status();
+  const B=[];
+  const back={t:"↩ 回廣場", f:()=>go("square")};
+  if(loc==="square"){
+    logTitle("平安鎮 · 廣場");
+    log("鎮中心人來人往：賣藝的、算命的、挑擔子的。告示牌上貼著幾張泛黃的海捕文書。","sys");
+    B.push({t:"村長家", f:()=>go("chief")});
+    B.push({t:"悅來客棧", f:()=>go("inn")});
+    B.push({t:"回春藥鋪", f:()=>go("med")});
+    B.push({t:"王鐵匠鋪", f:()=>go("smith")});
+    B.push({t:"城郊樹林", f:()=>go("forest")});
+    B.push({t:"四處閒逛", f:wander});
+    if(P.married) B.push({t:"家", cls:"gold", f:()=>go("home")});
+    if(P.sect) B.push({t:"回"+SECTS[P.sect].place, cls:"gold", f:()=>go("sect")});
+    else B.push({t:"江湖門派", cls:"gold", f:()=>go("sectSelect")});
+    if(P.flags.map && !P.flags.camp) B.push({t:"黑風寨（據點）", cls:"danger", f:()=>go("camp")});
+    if(P.flags.camp && !P.flags.ending) B.push({t:"幽冥地宮", cls:"danger", f:()=>go("palace")});
+    B.push({t:"狀態", f:showStat});
+    B.push({t:"聯網·暗號", f:cheatMenu});
+    B.push({t:"江湖告示", f:()=>{ if(store.ok){try{localStorage.removeItem(SEEN_KEY);}catch(e){}} showNotice(); }});
+    B.push({t:"存檔/讀檔", f:saveMenu});
+  }
+  else if(loc==="chief"){
+    logTitle("村長家");
+    if(P.flags.ending){
+      log("村長顧炎武捋著鬍子，笑得合不攏嘴：「英雄出少年！平安鎮有你，老朽死也瞑目了……呸呸，長命百歲，長命百歲。」","talk");
+    } else if(!P.flags.map && mainAtkLv()>=30){
+      P.flags.map=true;
+      log("村長顧炎武神色一凜，屏退左右，從牆縫裡摸出一張油紙包好的地圖。","sys");
+      log("顧炎武：「孩子，你的武功已然登堂入室。實不相瞞——暗黑勢力『幽冥壇』在城西黑風寨設了據點。老朽派出的線人九死一生才帶回這張<b>密圖</b>。剷除他們，就靠你了！」","talk");
+      log("獲得【黑風寨密圖】！廣場上出現了新的去處。","gain");
+    } else {
+      log("村長顧炎武放下手中的書卷：「少俠來啦。鎮子小事多，可願替大夥兒分憂？」","talk");
+    }
+    if(P.task){
+      B.push({t:"繳令：「"+P.task.name+"」", cls:"gold", f:turnInTask});
+    } else if(!P.flags.ending){
+      B.push({t:"領取任務", cls:"gold", f:takeTask});
+    }
+    B.push(back);
+  }
+  else if(loc==="inn"){
+    logTitle("悅來客棧");
+    log("店小二肩上搭著白毛巾，一路小跑：「客官裡邊請——！打尖還是住店？」","talk");
+    SHOP_FOOD.forEach(it=>{
+      B.push({t:`${it.name}（${it.price}兩）`, f:()=>buyFood(it)});
+    });
+    B.push({t:"打工跑堂（賺錢）", f:work});
+    B.push({t:"住店歇息（10兩·全恢復）", f:rest});
+    if(!P.married) romanceButtons(B,"陸小樓");
+    B.push(back);
+  }
+  else if(loc==="med"){
+    logTitle("回春藥鋪");
+    log("藥鋪掌櫃眯著眼撥算盤：「本店童叟無欺，吃不死人的。」","talk");
+    SHOP_MED.forEach(it=>{
+      B.push({t:`${it.name}（${it.price}兩）`, f:()=>buyMed(it)});
+    });
+    if(!P.married) romanceButtons(B,"沈碧君");
+    B.push(back);
+  }
+  else if(loc==="smith"){
+    logTitle("王鐵匠鋪");
+    log("王鐵匠掄著大錘，火星四濺：「要買傢伙事兒？咱這兒的貨，江湖上都有名！」","talk");
+    log(`目前裝備：武器【${P.weapon?P.weapon.name:"赤手空拳"}】 護具【${P.armor?P.armor.name:"粗布短打"}】`,"sys");
+    SHOP_SMITH.forEach(it=>{
+      B.push({t:`${it.name}（${it.price}兩）`, f:()=>buyGear(it)});
+    });
+    B.push(back);
+  }
+  else if(loc==="forest"){
+    logTitle("城郊樹林");
+    log("林子裡霧氣沼沼，時有野獸與宵小出沒，正是練功歷練的好去處。","sys");
+    B.push({t:"尋找對手", cls:"gold", f:huntForest});
+    B.push({t:"深入密林（較危險）", cls:"danger", f:huntDeep});
+    B.push(back);
+  }
+  else if(loc==="sectSelect"){
+    logTitle("江湖門派");
+    log("你向茶館說書先生打聽，得知這片大陸上有四大門派廣收門徒：","sys");
+    Object.keys(SECTS).forEach(k=>{
+      const s=SECTS[k];
+      B.push({t:s.name, f:()=>askSect(k)});
+    });
+    B.push(back);
+  }
+  else if(loc==="sect"){
+    const s=SECTS[P.sect];
+    logTitle(s.place+" · "+s.name);
+    log(`${s.master}正在指點弟子練功，見你回來，微微頷首。`,"sys");
+    B.push({t:"學習武功（花潛能）", cls:"gold", f:learnMenu});
+    B.push({t:"打坐修煉內功", f:meditate});
+    B.push({t:"與師兄切磋", f:spar});
+    if(P.sect==="maoshan") B.push({t:"畫符（茅山絕藝）", cls:"gold", f:talismanMenu});
+    B.push({t:"請教掌門", f:askMaster});
+    B.push(back);
+  }
+  else if(loc==="home"){
+    const n=P.married.name;
+    logTitle("家");
+    log(`推開院門，${n}正在燈下等你。屋裡飯菜的香氣撲面而來。`,"sys");
+    B.push({t:"用飯（每日一次）", f:()=>{
+      if(P.flags.homeDay===P.day){ log(`${n}笑道：「才吃過又餓啦？灶上沒火了，明日再說。」`,"talk"); return; }
+      P.flags.homeDay=P.day;
+      P.food=100; P.hp=Math.min(maxHp(),P.hp+80);
+      log(`${n}給你盛了滿滿一碗：「行走江湖，總得吃飽。」（飽食全滿，氣血+80）`,"gain");
+      saveGame(true); status();
+    }});
+    B.push({t:"夫妻雙修", f:()=>{
+      if(P.food<20){ log("腹中空空，還是先吃飯吧。","dmg"); return; }
+      const exp=15+rand(10)+Math.floor(P.wis/2), pot=8+rand(6);
+      P.exp+=exp; P.pot+=pot; P.mp=maxMp();
+      log(`你與${n}相對而坐，內息交融，互為呼應，果然事半功倍。（經驗+${exp} 潛能+${pot} 內力全滿）`,"gain");
+      tick(15); saveGame(true);
+    }});
+    B.push({t:"閒話家常", f:()=>{
+      const lines=[
+        `${n}：「今天鎮上又在傳幽冥壇的事，你在外頭千萬當心。」`,
+        `${n}替你縫補衣裳：「瞧你這袖口，又是跟人過招掛破的吧？」`,
+        `${n}打了個哈哈：「今天的天氣真是……哈哈。」你們相視大笑。`
+      ];
+      log(lines[rand(lines.length)],"talk");
+    }});
+    B.push(back);
+  }
+  else if(loc==="camp"){
+    logTitle("黑風寨");
+    log("按著密圖尋來，只見山坳裡一座黑黢黢的寨子，寨門上掛著兩盞慘綠的燈籠。","sys");
+    B.push({t:"闖寨！（連戰）", cls:"danger", f:raidCamp});
+    B.push(back);
+  }
+  else if(loc==="palace"){
+    logTitle("幽冥地宮");
+    log("黑風寨密室的地道盡頭，是一座陰森的地下宮殿。石壁上的長明燈幽幽晃動，寒氣砭骨。","sys");
+    log("【警告】此乃幽冥壇總壇，壇主玄冥子武功深不可測。建議主修武功 60 級以上、備足藥品再來。","dmg");
+    B.push({t:"殺入地宮！", cls:"danger", f:raidPalace});
+    B.push(back);
+  }
+  buttons(B);
+}
+
+/* ============ 商店 ============ */
+function buyFood(it){
+  if(P.money<it.price){ log("囊中羞澀，買不起啊。","dmg"); return; }
+  P.money-=it.price;
+  P.food=Math.min(100,P.food+it.food);
+  if(it.hp) P.hp=Math.min(maxHp(),P.hp+it.hp);
+  if(it.mp) P.mp=Math.min(maxMp(),P.mp+it.mp);
+  log(`你吃下${it.name}，只覺${it.mp?"一股暖流直入丹田":"渾身舒坦"}。`,"gain");
+  status();
+}
+function buyMed(it){
+  if(P.money<it.price){ log("掌櫃把算盤一收：「沒錢別擋著做生意。」","dmg"); return; }
+  P.money-=it.price;
+  P.hp=Math.min(maxHp(),P.hp+it.hp);
+  if(it.mp) P.mp=Math.min(maxMp(),P.mp+it.mp);
+  log(`你服下${it.name}，傷勢大有好轉。（氣血+${it.hp}${it.mp?" 內力+"+it.mp:""}）`,"gain");
+  status();
+}
+function buyGear(it){
+  if(P.money<it.price){ log("王鐵匠哼了一聲：「先去賺錢吧，小子。」","dmg"); return; }
+  P.money-=it.price;
+  if(it.type==="weapon") P.weapon={name:it.name,atk:it.atk};
+  else P.armor={name:it.name,def:it.def};
+  log(`你買下【${it.name}】並裝備上了。${it.desc}。`,"gain");
+  go("smith");
+}
+function work(){
+  if(P.food<15){ log("餓著肚子哪有力氣跑堂？先吃點東西。","dmg"); return; }
+  const earn=8+rand(8)+Math.floor(P.agi/3);
+  P.money+=earn;
+  log(`你在客棧跑堂半日，端盤子端得虎虎生風，掌櫃賞了你 ${earn} 兩銀子。`,"gain");
+  tick(18);
+}
+function rest(){
+  if(P.money<10){ log("店小二賠笑：「客官，本店概不賒帳……」","dmg"); return; }
+  P.money-=10;
+  P.hp=maxHp(); P.mp=maxMp(); P.food=100; P.day++;
+  log("你美美睡了一覺，醒來只覺神完氣足，百脈通暢。（全恢復）","gain");
+  status();
+}
+
+/* ============ 任務 ============ */
+const TASK_POOL = [
+  {name:"替張大娘掃地", text:"張大娘家塵土滿天難呼吸，你掄起掃帚：「掃地掃地我掃地……」", type:"chore"},
+  {name:"送信給李也白", text:"你把信送到吟遊詩人手上，他打了個哈哈：「今天的天氣真是，哈哈。」", type:"chore"},
+  {name:"幫王鐵匠拉風箱", text:"你拉了一下午風箱，膀子都酸了，鐵匠直誇你有把子力氣。", type:"chore"},
+  {name:"教訓潑皮無賴", enemy:"poopi", type:"fight"},
+  {name:"驅逐惡犬", enemy:"dog", type:"fight"},
+  {name:"剿滅山賊", enemy:"bandit", type:"fight"},
+  {name:"緝拿江洋大盜", enemy:"robber", type:"fight"}
+];
+function takeTask(){
+  let pool=TASK_POOL.filter(t=>{
+    if(t.type==="chore") return true;
+    const e=ENEMIES[t.enemy];
+    return e.atk <= playerAtk()*1.4+20;
+  });
+  const t=pool[rand(pool.length)];
+  P.task={...t, done:t.type==="chore"};
+  log(`顧炎武：「有勞少俠——<b>${t.name}</b>。事成之後，必有酬謝。」`,"talk");
+  if(t.type==="chore"){
+    log(t.text,"sys");
+    log("差事辦妥了！回報村長即可繳令。","gain");
+    tick(10);
+  } else {
+    log(`【任務】去城郊樹林尋找並擊敗「${ENEMIES[t.enemy].name}」，再回村長家繳令。`,"sys");
+  }
+  go("chief");
+}
+function turnInTask(){
+  if(!P.task.done){ log("顧炎武：「少俠，差事還沒辦妥呢。」","talk"); return; }
+  P.flags.taskCount++;
+  const bonus = P.task.type==="chore"?1:2;
+  const exp=(20+rand(15))*bonus, pot=(8+rand(6))*bonus, money=(6+rand(10))*bonus;
+  P.exp+=exp; P.pot+=pot; P.money+=money;
+  log(`顧炎武撫掌大笑：「好！好一個少年英雄！」（經驗+${exp} 潛能+${pot} 銀兩+${money}）`,"gain");
+  P.task=null;
+  status(); go("chief");
+}
+
+/* ============ 門派 ============ */
+function askSect(k){
+  const s=SECTS[k];
+  clearLog();
+  logTitle(s.name);
+  log(s.intro,"sys");
+  log(`拜師條件：${s.reqText}`,"sys");
+  log(`門派武學：內功【${s.inner}】 攻擊【${s.attack}】 輕功【${s.light}】 絕招【${s.ult.name}】`,"sys");
+  const ok = s.req(P) && !P.sect;
+  buttons([
+    {t:"拜入"+s.name, cls:"gold", dis:!ok, f:()=>joinSect(k)},
+    {t:"再看看別家", f:()=>go("sectSelect")}
+  ]);
+  if(P.sect) log("你已有師承，江湖中人最重門風，豈可朝三暮四？","dmg");
+  else if(!s.req(P)) log("可惜你的資質尚不符合此派要求。","dmg");
+}
+function joinSect(k){
+  P.sect=k;
+  const s=SECTS[k];
+  clearLog();
+  logTitle("拜 師");
+  log(`你來到${s.place}，恭恭敬敬磕了三個響頭。`,"sys");
+  log(`${s.master}：「江湖險惡，習武先修德。從今日起，你便是我${s.name}弟子了。」`,"talk");
+  log(`你學會了武功的入門法門：【${s.inner}】【${s.attack}】【${s.light}】（等級0，快用潛能修煉吧！）`,"gain");
+  go("sect");
+}
+function learnCost(lv){
+  return Math.max(2, Math.ceil((lv+1)*20/(10+P.wis)));
+}
+function learnMenu(){
+  const s=SECTS[P.sect];
+  clearLog();
+  logTitle("修煉武功");
+  const rows=[
+    {k:"basic", n:"基本拳腳"},
+    {k:"inner", n:s.inner},
+    {k:"attack",n:s.attack},
+    {k:"light", n:s.light}
+  ];
+  rows.forEach(r=>{
+    const lv=P.skills[r.k];
+    log(`【${r.n}】${lv}級（${lvTitle(lv)}）— 升級需潛能 ${learnCost(lv)}`,"sys");
+  });
+  log(`目前潛能：${P.pot}`,"gain");
+  log(`絕招【${s.ult.name}】：主修攻擊武功達 ${s.ult.minLv} 級自動領悟。${s.ult.desc}`,"sys");
+  const B=rows.map(r=>({t:"練 "+r.n, f:()=>learn(r.k,r.n)}));
+  B.push({t:"↩ 返回", f:()=>go("sect")});
+  buttons(B);
+}
+function learn(k,n){
+  const cost=learnCost(P.skills[k]);
+  if(P.pot<cost){ log("潛能不足！多做任務、多打怪吧。","dmg"); return; }
+  if(P.food<10){ log("肚子餓得咕咕叫，練不動了。","dmg"); return; }
+  P.pot-=cost;
+  P.skills[k]++;
+  const lv=P.skills[k];
+  log(`你苦練一番，【${n}】提升到 ${lv} 級（${lvTitle(lv)}）！`,"gain");
+  if(k==="inner"){ P.hp=Math.min(P.hp+8,maxHp()); P.mp=Math.min(P.mp+10,maxMp()); }
+  const s=SECTS[P.sect];
+  if(k==="attack" && lv===s.ult.minLv){
+    log(`電光石火之間，你福至心靈，竟領悟了本門絕學——【${s.ult.name}】！`,"title");
+  }
+  tick(4);
+  learnMenu();
+}
+function meditate(){
+  if(P.food<20){ log("氣息浮動，飢腸轆轆，如何入定？","dmg"); return; }
+  const gain=5+Math.floor(P.wis/2)+rand(5);
+  P.pot+=Math.floor(gain/2);
+  P.mp=maxMp();
+  P.exp+=gain;
+  log(`你盤膝打坐，一炷香、兩炷香……周天運轉，內息綿綿不絕。（內力全滿，經驗+${gain}，潛能+${Math.floor(gain/2)}）`,"gain");
+  tick(20);
+}
+function spar(){
+  if(P.food<15){ log("師兄擺擺手：「師弟你先去吃飯，餓著肚子切磋沒意思。」","talk"); return; }
+  const myLv=mainAtkLv();
+  const win = rand(100) < 45+P.agi;
+  const exp=10+rand(10)+Math.floor(myLv/2);
+  const pot=4+rand(4);
+  if(win){
+    log(`你與大師兄拆了三十餘招，一記巧勁把師兄逼出圈外。師兄抱拳：「師弟好俊的功夫！」（經驗+${exp} 潛能+${pot}）`,"gain");
+  } else {
+    log(`你與大師兄過招，被一招按倒在地。師兄哈哈大笑：「莫急莫急，回去多練練。」（經驗+${exp} 潛能+${pot}）`,"sys");
+  }
+  P.exp+=exp; P.pot+=pot;
+  tick(12);
+}
+function askMaster(){
+  const s=SECTS[P.sect];
+  const lv=mainAtkLv();
+  const lines=[
+    `${s.master}：「武功者，末技也；俠義者，大道也。」`,
+    `${s.master}：「你的【${s.attack}】已有${lvTitle(P.skills.attack)}的火候，尚需勤修不輟。」`,
+    `${s.master}打了個哈哈：「今天的天氣真是……哈哈。」`,
+    `${s.master}：「江湖傳言幽冥壇死灰復燃，你在外行走，須多加小心。」`
+  ];
+  if(lv>=60 && P.flags.camp) log(`${s.master}正色道：「幽冥地宮兇險萬分，記得帶足傷藥，內力未滿不可貿然出手。為師……等你凱旋。」`,"talk");
+  else log(lines[rand(lines.length)],"talk");
+}
+
+/* ============ 奇遇事件 ============ */
+const EVENTS = [
+  {w:3, f:()=>{ const m=40+rand(110); P.money+=m;
+    log(`路邊草叢裡竟有個遺落的錢袋！你四下張望無人認領，只好……卻之不恭了。（銀兩+${m}）`,"gain"); }},
+  {w:2, f:()=>{ const p=30+rand(30); P.pot+=p;
+    log("一位掃地老僧與你擦肩而過，隨口點了你兩句。你越想越覺深奧，竟隱隱觸類旁通！（潛能+"+p+"）","gain"); }},
+  {w:2, f:()=>{ const k=P.sect?"attack":"basic"; P.skills[k]+=2;
+    const n=P.sect?SECTS[P.sect].attack:"基本拳腳";
+    log(`山壁裂縫中藏著半卷殘破的武學圖譜！你依圖參詳，【${n}】+2級（現${P.skills[k]}級）。`,"gain");
+    const s=P.sect?SECTS[P.sect]:null;
+    if(s&&P.skills.attack>=s.ult.minLv&&P.skills.attack-2<s.ult.minLv) log(`你福至心靈，領悟絕招【${s.ult.name}】！`,"title"); }},
+  {w:2, f:()=>{ const e=25+rand(25), p=10+rand(10); P.exp+=e; P.pot+=p;
+    log(`林間一位蒙面高人邀你過招，拆了十餘招後飄然而去：「孺子可教。」（經驗+${e} 潛能+${p}）`,"gain"); }},
+  {w:1, f:()=>{ P.con=Math.min(100,P.con+1); P.hp=Math.min(P.hp+50,maxHp());
+    log("崖邊一株老樹上結著一枚異果，服下後遍體生溫——根骨永久+1！","title"); }},
+  {w:2, f:()=>{ const d=15+rand(20); P.hp=Math.max(1,P.hp-d);
+    log(`誤觸了馬蜂窩！你抱頭鼠竄，還是被蜇了好幾下。（氣血-${d}）`,"dmg"); }},
+  {w:2, f:()=>{ const m=Math.min(P.money,10+rand(20)); P.money-=m;
+    log(`一個小乞丐撞了你一下就跑——摸摸錢袋，少了${m}兩！你苦笑：這身法，不去學武可惜了。`,"dmg"); }},
+  {w:2, f:()=>{ P.food=Math.min(100,P.food+30);
+    log("好心的農家大嬸硬塞給你兩個剛出鍋的菜糰子：「習武的孩子，可不能餓著！」（飽食+30）","gain"); }},
+  {w:1, f:()=>{ const m=80+rand(80); P.money+=m; P.exp+=20;
+    log(`你救下一位被山賊追趕的落難鏢師。他千恩萬謝，奉上謝儀。（銀兩+${m} 經驗+20）`,"gain"); }},
+  {w:2, f:()=>{ log("吟遊詩人李也白坐在大石上，見你便打了個哈哈：「今天的天氣真是……哈哈。」你陪他哈哈了半天，也不知哈了些什麼。（經驗+5）","talk"); P.exp+=5; }}
+];
+function rollEvent(){
+  const total=EVENTS.reduce((a,e)=>a+e.w,0);
+  let r=rand(total);
+  for(const e of EVENTS){ if((r-=e.w)<0){ e.f(); break; } }
+  tick(6); saveGame(true);
+}
+function wander(){
+  logTitle("四處閒逛");
+  if(rand(100)<70) rollEvent();
+  else { log("你在鎮上東遊西逛，看了半天雜耍，什麼也沒發生。日子就是這麼平平淡淡。","sys"); tick(5); }
+}
+
+/* ============ 茅山符籙 ============ */
+const TALIS = {
+  lei: {name:"雷符",   price:20, mp:15, desc:"戰鬥中祭出，五雷加身、無視防禦，威力隨茅山心法增長"},
+  hu:  {name:"護身符", price:15, mp:10, desc:"戰鬥中祭出，金光護體，回復氣血並擋下敵人此回合攻勢"},
+  shen:{name:"神行符", price:10, mp:5,  desc:"戰鬥中祭出，足下生風，必定脫離戰鬥（幽冥壇主的封禁除外）"}
+};
+function talismanMenu(){
+  clearLog();
+  logTitle("茅山 · 畫符");
+  log("玄符子：「畫符講究一氣呵成——硃砂要錢，黃紙要錢，運筆的內力，嘿，那是你自己的。」","talk");
+  Object.keys(TALIS).forEach(k=>{
+    const t=TALIS[k];
+    log(`【${t.name}】×${P.talismans[k]} — ${t.desc}`,"sys");
+  });
+  const B=Object.keys(TALIS).map(k=>{
+    const t=TALIS[k];
+    return {t:`畫${t.name}（${t.price}兩·內力${t.mp}）`, f:()=>{
+      if(P.money<t.price){ log("硃砂黃紙都買不起，畫什麼符？","dmg"); return; }
+      if(P.mp<t.mp){ log("內力不濟，強行畫符只會畫出一團廢紙。","dmg"); return; }
+      P.money-=t.price; P.mp-=t.mp;
+      P.talismans[k]++;
+      log(`你屏氣凝神，一筆而就——【${t.name}】成！（現有 ${P.talismans[k]} 張）`,"gain");
+      saveGame(true); status();
+    }};
+  });
+  B.push({t:"↩ 返回", f:()=>go("sect")});
+  buttons(B);
+}
+
+/* ============ 戰鬥 ============ */
+function startCombat(key, after){
+  const t=ENEMIES[key];
+  inCombat={
+    key:key,
+    name:t.name, hp:t.hp, maxhp:t.hp, atk:t.atk, def:t.def, agi:t.agi,
+    exp:t.exp, pot:t.pot, money:t.money, boss:t.boss||0,
+    after:after||null, fled:false
+  };
+  clearLog();
+  logTitle("遭遇戰 · "+t.name);
+  log(t.desc,"sys");
+  combatUI();
+}
+function combatBar(){
+  const e=inCombat, cb=$("combatbar");
+  if(!e){ cb.classList.add("hidden"); return; }
+  cb.classList.remove("hidden");
+  const ep=Math.max(0,Math.round(e.hp/e.maxhp*100));
+  const hp=Math.max(0,Math.round(P.hp/maxHp()*100));
+  const mp=Math.max(0,Math.round(P.mp/maxMp()*100));
+  cb.innerHTML =
+    `<span class="foe">${e.name}<span class="cbar"><i style="width:${ep}%"></i></span>${Math.max(0,e.hp)}</span>`+
+    `<span>你·氣血<span class="cbar"><i style="width:${hp}%"></i></span>${P.hp}</span>`+
+    `<span>內力<span class="cbar"><i style="width:${mp}%"></i></span>${P.mp}</span>`;
+}
+function combatUI(){
+  const e=inCombat;
+  combatBar();
+  const s=P.sect?SECTS[P.sect]:null;
+  const hasUlt = s && P.skills.attack>=s.ult.minLv;
+  const B=[
+    {t:"攻擊（"+atkName()+"）", f:()=>playerTurn("atk")},
+    {t:hasUlt?`絕招·${s.ult.name}（內力${s.ult.cost}）`:"絕招（未領悟）", cls:"gold", dis:!hasUlt||P.mp<(s?s.ult.cost:0), f:()=>playerTurn("ult")},
+    {t:"運功療傷（內力30）", dis:P.mp<30, f:()=>playerTurn("heal")}
+  ];
+  if(P.sect==="maoshan"){
+    B.push({t:`祭雷符×${P.talismans.lei}`, cls:"gold", dis:P.talismans.lei<1, f:()=>playerTurn("lei")});
+    B.push({t:`護身符×${P.talismans.hu}`, dis:P.talismans.hu<1, f:()=>playerTurn("hu")});
+    B.push({t:`神行符×${P.talismans.shen}`, dis:P.talismans.shen<1, f:()=>playerTurn("shen")});
+  }
+  B.push({t:"逃跑", cls:"danger", f:()=>playerTurn("flee")});
+  buttons(B);
+}
+function playerTurn(act){
+  const e=inCombat; if(!e) return;
+  const s=P.sect?SECTS[P.sect]:null;
+  let guarded=false;
+  if(act==="flee"){
+    if(e.boss===2){ log("玄冥子袍袖一拂封住地宮出口：「來了，還想走？」","dmg"); }
+    else if(rand(100) < 40+P.agi*2+P.skills.light*2){
+      log("你使出輕功，腳底抹油，一溜煙跑了。","sys");
+      inCombat=null; combatBar(); go("square"); return;
+    } else {
+      log("想跑？沒跑掉！","dmg");
+    }
+  }
+  else if(act==="shen"){
+    P.talismans.shen--;
+    if(e.boss===2){ log("神行符化作流光撞上地宮封禁，「啪」地碎了。玄冥子冷笑：「雕蟲小技。」","dmg"); }
+    else {
+      log("你祭出神行符，足下風雷乍起，眨眼已在三里之外！","gain");
+      inCombat=null; combatBar(); saveGame(true); go("square"); return;
+    }
+  }
+  else if(act==="lei"){
+    P.talismans.lei--;
+    const dmg=80+P.skills.inner*4+rand(20);
+    e.hp-=dmg;
+    log(`你咬破指尖祭出雷符，敕令一喝——霹靂一聲，紫電轟然劈落！（雷擊 ${dmg}，無視防禦）`,"gain");
+  }
+  else if(act==="hu"){
+    P.talismans.hu--;
+    const heal=60+P.skills.inner*3;
+    P.hp=Math.min(maxHp(),P.hp+heal);
+    guarded=true;
+    log(`你祭出護身符，周身金光大盛！（氣血+${heal}，此回合敵人攻勢盡數被金光擋下）`,"gain");
+  }
+  else if(act==="heal"){
+    P.mp-=30;
+    const heal=40+P.skills.inner*4;
+    P.hp=Math.min(maxHp(),P.hp+heal);
+    log(`你逼出一口真氣護住心脈，傷勢好轉。（氣血+${heal}）`,"gain");
+  }
+  else {
+    let dmg = playerAtk() + rand(12) - e.def;
+    let moveTxt = `你使出【${atkName()}】`;
+    if(act==="ult"){
+      P.mp-=s.ult.cost;
+      dmg = Math.floor((playerAtk()+rand(12))*s.ult.mult) - e.def;
+      moveTxt = `你大喝一聲，使出絕招【${s.ult.name}】`;
+    }
+    if(rand(100) < e.agi*2 && act!=="ult"){
+      log(`${moveTxt}，卻被${e.name}側身閃過！`,"sys");
+    } else {
+      dmg=Math.max(1,dmg);
+      e.hp-=dmg;
+      log(`${moveTxt}，正中${e.name}！（傷害 ${dmg}）`, act==="ult"?"gain":"");
+    }
+  }
+  if(e.hp<=0){ winCombat(); return; }
+  /* 敵方回合 */
+  if(guarded){
+    log(`${e.name}的攻勢撞上金光，紋絲不入！`,"sys");
+  } else {
+    const dodge = rand(100) < P.agi*1.5 + P.skills.light*1.5;
+    if(dodge){
+      log(`${e.name}撲了上來，你身形一晃，堪堪避開！`,"sys");
+    } else {
+      const dmg=Math.max(1, e.atk + rand(10) - playerDef());
+      P.hp-=dmg;
+      log(`${e.name}猛攻過來，你閃避不及！（受傷 ${dmg}）`,"dmg");
+    }
+  }
+  if(P.hp<=0){ loseCombat(); return; }
+  status();
+  combatUI();
+}
+function winCombat(){
+  const e=inCombat;
+  P.exp+=e.exp; P.pot+=e.pot; P.money+=e.money;
+  log(`${e.name}再也支撐不住，頹然倒地！`,"title");
+  log(`（經驗+${e.exp} 潛能+${e.pot}${e.money?" 銀兩+"+e.money:""}）`,"gain");
+  if(P.task && !P.task.done && P.task.enemy===e.key){
+    P.task.done=true;
+    log(`【任務】「${P.task.name}」已完成，回村長家繳令吧！`,"gain");
+  }
+  const after=e.after;
+  inCombat=null; combatBar();
+  tick(8);
+  if(after) after();
+  else buttons([{t:"繼續", f:()=>go(P.loc)}]);
+}
+function loseCombat(){
+  const e=inCombat;
+  inCombat=null;
+  P.hp=1; P.money=Math.max(0,P.money-Math.floor(P.money*0.2));
+  log(`你眼前一黑，倒了下去……`,"dmg");
+  logTitle("大難不死");
+  log("不知過了多久，你在悅來客棧的板床上悠悠醒轉，店小二端來一碗熱粥：「客官，是好心的過路人把你抬回來的。」（身上的銀兩少了兩成）","sys");
+  P.loc="inn"; status();
+  buttons([{t:"繼續", f:()=>go("inn")}]);
+}
+function huntForest(){
+  if(rand(100)<25){ logTitle("奇 遇"); rollEvent(); return; }
+  const pool=["dog","poopi","bandit"];
+  startCombat(pool[rand(pool.length)]);
+}
+function huntDeep(){
+  if(rand(100)<25){ logTitle("奇 遇"); rollEvent(); return; }
+  const pool=["bandit","wolf","robber"];
+  startCombat(pool[rand(pool.length)]);
+}
+
+/* ============ 故事線：黑風寨與幽冥地宮 ============ */
+function raidCamp(){
+  log("你深吸一口氣，飛身越過寨牆——","sys");
+  startCombat("minion", ()=>{
+    log("解決了門口的嘍囉，你直闖聚義廳！","sys");
+    buttons([{t:"挑戰寨主·獨眼蛟", cls:"danger", f:()=>startCombat("boss1", campCleared)}]);
+  });
+}
+function campCleared(){
+  P.flags.camp=true;
+  logTitle("黑風寨 · 破");
+  log("獨眼蛟臨死前慘笑：「殺了我……嘿嘿……幽冥壇主會替我報仇……地宮……就在……」話未說完便斷了氣。","talk");
+  log("你在聚義廳的密室裡發現一條幽深的地道，寒氣森森，直通地底——【幽冥地宮】已在廣場開啟！","gain");
+  log("回村長家看看吧，顧炎武一定有話要說。","sys");
+  buttons([{t:"繼續", f:()=>go("square")}]);
+}
+function raidPalace(){
+  log("你點亮火摺子，踏入地宮。甬道兩側的骸骨訴說著幽冥壇的暴行。","sys");
+  startCombat("guard", ()=>{
+    log("擊倒護法，前方豁然開朗——白骨王座之上，玄冥子緩緩睜開眼睛。","sys");
+    log("玄冥子：「數百年了……又是英雄壇送來的『英雄』。很好，本座正缺一個祭品。」","talk");
+    buttons([{t:"決戰！玄冥子", cls:"danger", f:()=>startCombat("boss2", palaceCleared)}]);
+  });
+}
+function palaceCleared(){
+  P.flags.ending=true;
+  clearLog();
+  logTitle("終 章 · 武林大會");
+  log("玄冥子仰天噴出一口黑血，難以置信地看著你：「不可能……本座苦修百年……」轟然倒地，地宮中的怨氣如潮水般退去。","sys");
+  log("三個月後，武林大會在平安鎮召開。金遠見王朝的賞善罰惡使者當眾宣讀：","sys");
+  log(`「${P.name}，年方${P.age}，剷除幽冥壇，救萬民於水火——賞善罰惡簿記首功，尊為<b>武林盟主</b>！」`,"talk");
+  log("台下歡聲雷動。李也白擠上前打了個哈哈：「今天的天氣真是……哈哈！」你也笑了。","talk");
+  log(`【全通關】用時 ${P.day} 日，主修【${atkName()}】${mainAtkLv()}級（${lvTitle(mainAtkLv())}）。`,"gain");
+  log("江湖路遠，後會有期。你仍可繼續在這片大陸上行走，或重新開始一段新的人生。","sys");
+  status();
+  buttons([
+    {t:"繼續行走江湖", f:()=>go("square")},
+    {t:"重開新檔", cls:"danger", f:()=>location.reload()}
+  ]);
+}
+
+/* ============ 聯網·暗號（作弊碼） ============ */
+const CHEATS = [
+  {code:"天罡地煞", desc:"四項先天屬性各 +10"},
+  {code:"富甲天下", desc:"銀兩 +10000"},
+  {code:"醍醐灌頂", desc:"潛能 +1000"},
+  {code:"一步登天", desc:"所有已學武功 +10 級"},
+  {code:"回滿",     desc:"氣血、內力、飽食全滿"},
+  {code:"膂力30",   desc:"直接指定屬性數值，可用：膂力／悟性／根骨／身法／銀兩／潛能 + 數字"}
+];
+function cheatMenu(){
+  clearLog();
+  logTitle("聯網 · 暗號");
+  log("你摸出懷中的傳訊玉符，江湖百曉生的聲音幽幽傳來：「暗號對上了，好處少不了你的。」","talk");
+  CHEATS.forEach(c=>log(`「<b>${c.code}</b>」— ${c.desc}`,"sys"));
+  buttons([
+    {t:"輸入暗號", cls:"gold", f:()=>{
+      const v=prompt("請輸入暗號：");
+      if(v!=null) applyCheat(v.trim());
+    }},
+    {t:"↩ 返回", f:()=>go("square")}
+  ]);
+}
+function applyCheat(v){
+  if(!v){ return; }
+  const m=v.match(/^(膂力|悟性|根骨|身法|銀兩|潛能)\s*(\d+)$/);
+  if(m){
+    const n=Math.min(99999, parseInt(m[2],10));
+    const map={"膂力":"str","悟性":"wis","根骨":"con","身法":"agi","銀兩":"money","潛能":"pot"};
+    const k=map[m[1]];
+    if(k==="str"||k==="wis"||k==="con"||k==="agi") P[k]=Math.min(100,n);
+    else P[k]=n;
+    log(`暗號生效！${m[1]}已調整為 ${P[k]}。`,"gain");
+  }
+  else if(v==="天罡地煞"){
+    ["str","wis","con","agi"].forEach(k=>P[k]=Math.min(100,P[k]+10));
+    log("暗號生效！一道天罡之氣灌入四肢百骸，先天屬性各 +10！","gain");
+  }
+  else if(v==="富甲天下"){
+    P.money+=10000;
+    log("暗號生效！百曉生笑道：「拿去花，別客氣。」（銀兩 +10000）","gain");
+  }
+  else if(v==="醍醐灌頂"){
+    P.pot+=1000;
+    log("暗號生效！只覺腦中轟然一響，往日所學盡數貫通。（潛能 +1000）","gain");
+  }
+  else if(v==="一步登天"){
+    Object.keys(P.skills).forEach(k=>{
+      if(k==="basic"||P.sect) P.skills[k]+=10;
+    });
+    P.hp=Math.min(P.hp,maxHp()); P.mp=Math.min(P.mp,maxMp());
+    log("暗號生效！所有已學武功齊升 10 級，當真一步登天！","gain");
+    const s=P.sect?SECTS[P.sect]:null;
+    if(s&&P.skills.attack>=s.ult.minLv) log(`你已具備施展絕招【${s.ult.name}】的火候！`,"title");
+  }
+  else if(v==="回滿"){
+    P.hp=maxHp(); P.mp=maxMp(); P.food=100;
+    log("暗號生效！氣血內力飽食俱已回滿，神完氣足。","gain");
+  }
+  else {
+    log("百曉生搖搖頭：「這暗號……老夫沒聽過。」","dmg");
+  }
+  status();
+}
+
+/* ============ 狀態與存檔 ============ */
+function showStat(){
+  clearLog();
+  logTitle("人物狀態");
+  log(`${P.name}（${P.gender}，${P.age}歲）【${heroTitle()}】${P.sect?"— "+SECTS[P.sect].name+"弟子":"— 無門無派"}`);
+  log(`膂力 ${P.str} ｜ 悟性 ${P.wis} ｜ 根骨 ${P.con} ｜ 身法 ${P.agi}`,"sys");
+  log(`攻擊力 ${playerAtk()} ｜ 防禦力 ${playerDef()} ｜ 經驗 ${P.exp} ｜ 完成任務 ${P.flags.taskCount} 件`,"sys");
+  const s=P.sect?SECTS[P.sect]:null;
+  log(`基本拳腳 ${P.skills.basic}級（${lvTitle(P.skills.basic)}）`,"sys");
+  if(s){
+    log(`${s.inner} ${P.skills.inner}級（${lvTitle(P.skills.inner)}）`,"sys");
+    log(`${s.attack} ${P.skills.attack}級（${lvTitle(P.skills.attack)}）${P.skills.attack>=s.ult.minLv?"— 已領悟【"+s.ult.name+"】":""}`,"sys");
+    log(`${s.light} ${P.skills.light}級（${lvTitle(P.skills.light)}）`,"sys");
+  }
+  log(`武器【${P.weapon?P.weapon.name:"無"}】 護具【${P.armor?P.armor.name:"無"}】`,"sys");
+  buttons([{t:"↩ 返回", f:()=>go("square")}]);
+}
+function saveMenu(){
+  clearLog();
+  logTitle("存檔 / 讀檔");
+  if(store.ok) log("【自動存檔】已啟用：進度會自動保存在此裝置，關閉重開後可直接「繼續上次的江湖」。以下存檔碼供跨裝置備份用。","sys");
+  else log("此環境不支援自動存檔，請以存檔碼保存進度：複製下方代碼，下次貼上讀取即可。","sys");
+  const code=btoa(unescape(encodeURIComponent(JSON.stringify(P))));
+  const ta=document.createElement("textarea");
+  ta.style.cssText="width:100%;height:70px;font-size:11px;background:transparent;border:2px solid #1c2916;border-radius:6px;color:#1c2916;padding:6px;font-family:monospace;";
+  ta.value=code;
+  $("log").appendChild(ta);
+  buttons([
+    {t:"立即存檔", cls:"gold", f:()=>{ saveGame(false); }},
+    {t:"複製存檔碼", f:()=>{ta.select();document.execCommand("copy");log("已複製！","gain");}},
+    {t:"讀取存檔碼", f:()=>{
+      const v=prompt("請貼上存檔碼：");
+      if(!v) return;
+      try{
+        const obj=JSON.parse(decodeURIComponent(escape(atob(v.trim()))));
+        if(!obj.name) throw 0;
+        P=migrate(obj); inCombat=null;
+        saveGame(true);
+        log("讀檔成功！存檔已自動升級至 v"+GAME_VERSION+"。歡迎回到江湖，"+P.name+"。","gain");
+        status(); go("square");
+      }catch(e){ log("存檔碼格式有誤，讀取失敗。","dmg"); }
+    }},
+    {t:"↩ 返回", f:()=>go("square")}
+  ]);
+}
+/* ============ 開機初始化 ============ */
+(async function boot(){
+  await loadPatch();               // 先吃線上補丁（離線則略過）
+  document.querySelector(".model").textContent = "WQX-1020 · 群俠壇說 v" + latestVer();
+  showNotice();                    // 有新版本才會彈出江湖告示
+  const saved=loadSaved();
+  if(saved){
+    const btn=document.createElement("button");
+    btn.className="start";
+    btn.style.cssText="display:block;margin:8px auto 0;font-size:14px;padding:8px 26px;";
+    btn.textContent="▶ 繼續上次的江湖（"+saved.name+"·第"+saved.day+"日）";
+    btn.onclick=function(){
+      P=saved; inCombat=null;
+      $("creator").classList.add("hidden");
+      $("game").classList.remove("hidden");
+      logTitle("重 返 江 湖");
+      log("你伸了個懶腰，客棧窗外傳來熟悉的叫賣聲。江湖，我"+P.name+"又回來了！","sys");
+      status(); go("square");
+    };
+    $("creator").appendChild(btn);
+  }
+})();
+</script>
+</body>
+</html>
